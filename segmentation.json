@@ -1,0 +1,57 @@
+{
+    "n_clusters": 3,
+    "segment_sizes": {
+        "Low-Value Customers": 2616,
+        "Moderate-Value Customers": 1598,
+        "High-Value Customers": 8
+    },
+    "segment_characteristics": {
+        "customer_id": {
+            "High-Value Customers": 8,
+            "Low-Value Customers": 2616,
+            "Moderate-Value Customers": 1598
+        },
+        "total_orders": {
+            "High-Value Customers": 123.5,
+            "Low-Value Customers": 1.93,
+            "Moderate-Value Customers": 8.41
+        },
+        "total_spent": {
+            "High-Value Customers": 35448.41,
+            "Low-Value Customers": 442.0,
+            "Moderate-Value Customers": 2108.64
+        },
+        "avg_order_value": {
+            "High-Value Customers": 11.93,
+            "Low-Value Customers": 15.84,
+            "Moderate-Value Customers": 16.52
+        },
+        "customer_lifetime": {
+            "High-Value Customers": 334.12,
+            "Low-Value Customers": 37.6,
+            "Moderate-Value Customers": 282.01
+        }
+    },
+    "cluster_centers": {
+        "total_orders": [
+            0.4583561695514145,
+            14.394691828112027,
+            -0.3252083147956579
+        ],
+        "total_spent": [
+            0.3958568974798109,
+            14.06337467588827,
+            -0.2858613120864329
+        ],
+        "avg_order_value": [
+            0.03750042991708762,
+            -0.36508513616205185,
+            -0.021881702771010033
+        ],
+        "customer_lifetime": [
+            1.1427485205969046,
+            1.5387823615161373,
+            -0.7055870554702817
+        ]
+    }
+}

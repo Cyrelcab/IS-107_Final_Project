@@ -8,6 +8,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 from datetime import datetime
 import calendar
+import json
 
 #load the .env
 load_dotenv()
@@ -116,10 +117,10 @@ data = load_data(query)
 with st.sidebar:
     selected = option_menu("Menu", 
                            ["Home", "Overview", "Sales", "Insights", 
-                            "Product Forecasting", "Sales Forecasting", "Customer Segmentation"
+                            "Sales Forecasting", "Customer Segmentation"
                             ], 
                            icons=['house', 'speedometer', 'bar-chart', 
-                                  'lightbulb', 'people', 'graph-up-arrow', 
+                                  'lightbulb', 'graph-up-arrow', 
                                   'people-fill', 'boxes'
                                   ],
                            menu_icon="dashboard", 
@@ -702,12 +703,164 @@ elif selected == "Insights":
             f"• Top 3 markets: {', '.join(top_3_countries.index)}"
         )
 
-#if "Product Forecasting" is selected in the option_menu 
-# elif selected == 'Product Forecasting':
-
+#if "Sales Forecasting" is selected in the option_menu 
+elif selected == 'Sales Forecasting':
+    st.title("📊 Sales Forecasting")
+    st.markdown("---")
     
+    # Create tabs for different time granularities
+    tab1, tab2, tab3 = st.tabs(["Daily Forecast", "Weekly Forecast", "Monthly Forecast"])
+    
+    # Load JSON data
+    with open('daily.json') as f:
+        daily_data = json.load(f)
+    with open('weekly.json') as f:
+        weekly_data = json.load(f)
+    with open('monthly.json') as f:
+        monthly_data = json.load(f)
+    
+    # Daily Forecast Tab
+    with tab1:
+        st.subheader("Daily Sales Forecast")
+        
+        # Convert historical data
+        daily_dates = list(daily_data['historical_sales'].keys())
+        daily_values = list(daily_data['historical_sales'].values())
+        
+        # Create forecast dates (next 12 days)
+        last_date = pd.to_datetime(daily_dates[-1])
+        forecast_dates = [(last_date + pd.Timedelta(days=i+1)).strftime('%Y-%m-%d %H:%M:%S') 
+                         for i in range(len(daily_data['forecasted_sales']))]
+        
+        # Create plot
+        fig_daily = go.Figure()
+        
+        # Add historical data
+        fig_daily.add_trace(go.Scatter(
+            x=daily_dates,
+            y=daily_values,
+            name='Historical Sales',
+            line=dict(color='blue')
+        ))
+        
+        # Add forecasted data
+        fig_daily.add_trace(go.Scatter(
+            x=forecast_dates,
+            y=daily_data['forecasted_sales'],
+            name='Forecasted Sales',
+            line=dict(color='red', dash='dash')
+        ))
+        
+        fig_daily.update_layout(
+            title='Daily Sales Forecast',
+            xaxis_title='Date',
+            yaxis_title='Sales',
+            hovermode='x unified'
+        )
+        
+        st.plotly_chart(fig_daily, use_container_width=True)
 
+        add_col1, add_col2, add_col3 = st.columns(3)
 
+        with add_col1:
+            st.info(f"**Total Predicted Sales**\n\n${daily_data['total_predicted_sales']:,.2f}")
+
+        with add_col2:
+            st.info(f"**Total Actual Sales**\n\n${daily_data['total_actual_sales']:,.2f}")
+
+        with add_col3:
+            st.info(f"**Prediction Difference**\n\n${daily_data['prediction_difference']:,.2f}")
+    
+    # Weekly Forecast Tab
+    with tab2:
+        st.subheader("Weekly Sales Forecast")
+        
+        # Convert historical data
+        weekly_dates = list(weekly_data['historical_sales'].keys())
+        weekly_values = list(weekly_data['historical_sales'].values())
+        
+        # Create forecast dates (next 12 weeks)
+        last_date = pd.to_datetime(weekly_dates[-1])
+        forecast_dates = [(last_date + pd.Timedelta(weeks=i+1)).strftime('%Y-%m-%d %H:%M:%S') 
+                         for i in range(len(weekly_data['forecasted_sales']))]
+        
+        # Create plot
+        fig_weekly = go.Figure()
+        
+        # Add historical data
+        fig_weekly.add_trace(go.Scatter(
+            x=weekly_dates,
+            y=weekly_values,
+            name='Historical Sales',
+            line=dict(color='blue')
+        ))
+        
+        # Add forecasted data
+        fig_weekly.add_trace(go.Scatter(
+            x=forecast_dates,
+            y=weekly_data['forecasted_sales'],
+            name='Forecasted Sales',
+            line=dict(color='red', dash='dash')
+        ))
+        
+        fig_weekly.update_layout(
+            title='Weekly Sales Forecast',
+            xaxis_title='Date',
+            yaxis_title='Sales',
+            hovermode='x unified'
+        )
+        
+        st.plotly_chart(fig_weekly, use_container_width=True)
+        st.metric("Total Predicted Sales", f"${weekly_data['total_predicted_sales']:,.2f}")
+        st.metric("Total Actual Sales", f"${weekly_data['total_actual_sales']:,.2f}")
+        st.metric("Prediction Difference", f"${weekly_data['prediction_difference']:,.2f}")
+    
+    # Monthly Forecast Tab
+    with tab3:
+        st.subheader("Monthly Sales Forecast")
+        
+        # Convert historical data
+        monthly_dates = list(monthly_data['historical_sales'].keys())
+        monthly_values = list(monthly_data['historical_sales'].values())
+        
+        # Create forecast dates (next 12 months)
+        last_date = pd.to_datetime(monthly_dates[-1])
+        forecast_dates = []
+        for i in range(len(monthly_data['forecasted_sales'])):
+            # Use pd.DateOffset for monthly increments
+            next_date = last_date + pd.DateOffset(months=i+1)
+            forecast_dates.append(next_date.strftime('%Y-%m-%d %H:%M:%S'))
+        
+        # Create plot
+        fig_monthly = go.Figure()
+        
+        # Add historical data
+        fig_monthly.add_trace(go.Scatter(
+            x=monthly_dates,
+            y=monthly_values,
+            name='Historical Sales',
+            line=dict(color='blue')
+        ))
+        
+        # Add forecasted data
+        fig_monthly.add_trace(go.Scatter(
+            x=forecast_dates,
+            y=monthly_data['forecasted_sales'],
+            name='Forecasted Sales',
+            line=dict(color='red', dash='dash')
+        ))
+        
+        fig_monthly.update_layout(
+            title='Monthly Sales Forecast',
+            xaxis_title='Date',
+            yaxis_title='Sales',
+            hovermode='x unified'
+        )
+        
+        st.plotly_chart(fig_monthly, use_container_width=True)
+        st.metric("Total Predicted Sales", f"${monthly_data['total_predicted_sales']:,.2f}")
+        st.metric("Total Actual Sales", f"${monthly_data['total_actual_sales']:,.2f}")
+        st.metric("Prediction Difference", f"${monthly_data['prediction_difference']:,.2f}")
 
 # Footer
 st.markdown("---")
